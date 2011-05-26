@@ -11,6 +11,8 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -303,6 +305,22 @@ public class ImageViewFlipper extends TouchActivity {
 	}
 
 	class MyGestureDetector extends SimpleOnGestureListener {
+		private int toggleCount = 0; 
+		@Override
+		public boolean onDoubleTap(final MotionEvent e){
+			
+			
+	    	ImageView view = (ImageView)findViewById(R.id.zero);
+			switch(currentView){
+			case 0: view = (ImageView)findViewById(R.id.zero); break;
+			case 1: view = (ImageView)findViewById(R.id.one); break;
+			case 2:view = (ImageView)findViewById(R.id.two); break;				
+			}
+			 
+			resetImage(view,view.getDrawable());
+			return true;
+		}
+		
 		@Override
 		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 				float velocityY) {
@@ -321,64 +339,66 @@ public class ImageViewFlipper extends TouchActivity {
 						currentIndex = currentIndex + 1;
 					}
 					ImageView iv;
+					Drawable d = Drawable.createFromPath(ImageList
+							.get(currentIndex));
+					
 					if (currentView == 0) {
 						currentView = 1;
 						 iv = (ImageView) findViewById(R.id.one);
 
-						iv.setImageDrawable(Drawable.createFromPath(ImageList
-								.get(currentIndex)));
+						iv.setImageDrawable(d);
 						
 						
 						System.gc();
 					} else if (currentView == 1) {
 						currentView = 2;
 						 iv = (ImageView) findViewById(R.id.two);
-
-						iv.setImageDrawable(Drawable.createFromPath(ImageList
-								.get(currentIndex)));
+						 
+						iv.setImageDrawable(d);
 						System.gc();
 					} else {
 						currentView = 0;
 						 iv = (ImageView) findViewById(R.id.zero);
 
-						iv.setImageDrawable(Drawable.createFromPath(ImageList
-								.get(currentIndex)));
+						iv.setImageDrawable(d);
 						System.gc();
 					}
-					resetImage(iv,Drawable.createFromPath(ImageList
-							.get(currentIndex)));
+					resetImage(iv,d);
 					Log.v("ImageViewFlipper", "Current View: " + currentView);
 					viewFlipper.showNext();
+					return true;
 				} else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
 						&& Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
 					viewFlipper.setInAnimation(slideRightIn);
 					viewFlipper.setOutAnimation(slideRightOut);
-					ImageView iv;
+					
+					
+					
 					if (currentIndex == 0) {
 						currentIndex = maxIndex;
 					} else {
 						currentIndex = currentIndex - 1;
 					}
+					ImageView iv;
+					Drawable d = Drawable.createFromPath(ImageList
+							.get(currentIndex));
 					if (currentView == 0) {
 						currentView = 2;
 						iv = (ImageView) findViewById(R.id.two);
-						iv.setImageDrawable(Drawable.createFromPath(ImageList
-								.get(currentIndex)));
+						iv.setImageDrawable(d);
 					} else if (currentView == 2) {
 						currentView = 1;
 						iv = (ImageView) findViewById(R.id.one);
-						iv.setImageDrawable(Drawable.createFromPath(ImageList
-								.get(currentIndex)));
+						iv.setImageDrawable(d);
 					} else {
 						currentView = 0;
 						iv = (ImageView) findViewById(R.id.zero);
-						iv.setImageDrawable(Drawable.createFromPath(ImageList
-								.get(currentIndex)));
+						iv.setImageDrawable(d);
 					}
-					resetImage(iv,Drawable.createFromPath(ImageList
-							.get(currentIndex)));
+					resetImage(iv,d);
 					Log.v("ImageViewFlipper", "Current View: " + currentView);
 					viewFlipper.showPrevious();
+					return true;
 				}
 			} catch (Exception e) {
 				// nothing
@@ -387,6 +407,7 @@ public class ImageViewFlipper extends TouchActivity {
 		}
 		
 	}
+	@Override
 	public void resetImage(ImageView iv, Drawable draw) {
 		Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
 		int rotation = display.getRotation();
@@ -443,16 +464,14 @@ public class ImageViewFlipper extends TouchActivity {
 	public boolean onTouchEvent(MotionEvent rawEvent) {
 		if(gestureDetector.onTouchEvent(rawEvent))
 			return true;
+			
 		
 		ImageView view = (ImageView)findViewById(R.id.zero);
-		if(currentView==0)
-			view = (ImageView)findViewById(R.id.zero);
-		if(currentView==1)
-			view = (ImageView)findViewById(R.id.one);
-		if(currentView==2)
-			view = (ImageView)findViewById(R.id.two);
-		Log.v("ImageViewFlipper", "Touch current view: " + currentView);
-
+		switch(currentView){
+		case 0: view = (ImageView)findViewById(R.id.zero); break;
+		case 1: view = (ImageView)findViewById(R.id.one); break;
+		case 2:view = (ImageView)findViewById(R.id.two); break;				
+		}	
 		onTouchEvented(view, rawEvent);
 		
 		return true;

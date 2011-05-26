@@ -14,6 +14,7 @@ import android.R;
 import android.app.Activity;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.FloatMath;
 import android.util.Log;
@@ -63,6 +64,8 @@ public abstract class TouchActivity extends Activity {
    }
    
    public abstract float getMinZoomScale();
+   public abstract void resetImage(ImageView iv, Drawable draw);
+
    
    public boolean onTouchEvented(View v, MotionEvent rawEvent) {
 	 
@@ -108,6 +111,11 @@ public abstract class TouchActivity extends Activity {
          refLineStart = null;
          refLineEnd = null;
          mRotateAngle = 0f;
+         
+         float[] values = new float[9];
+ 	     view.getImageMatrix().getValues(values);
+ 		 if(values[0]<=getMinZoomScale())
+ 		   resetImage(view,view.getDrawable());
          break;
       case MotionEvent.ACTION_MOVE:
          if (mode == DRAG) {
@@ -130,13 +138,13 @@ public abstract class TouchActivity extends Activity {
               
                // test scale matrix 
                test.postScale(scale, scale, mid.x, mid.y);
-               float[] values = new float[9];
-               test.getValues(values);
+               float[] svalues = new float[9];
+               test.getValues(svalues);
                
-               if(values[0]>=getMinZoomScale())
+               //if(svalues[0]>=getMinZoomScale())
             	   matrix.postScale(scale, scale, mid.x, mid.y);
-               else
-            	   matrix.setScale(getMinZoomScale(), getMinZoomScale(), mid.x, mid.y);
+               //else
+            	 //  matrix.setScale(getMinZoomScale(), getMinZoomScale(), mid.x, mid.y);
                
                // get the latest line
                newStart.set(event.getX(0), event.getY(0));
@@ -164,6 +172,8 @@ public abstract class TouchActivity extends Activity {
       
       view.setImageMatrix(matrix);
       
+     
+      System.gc();
       
       return true; // indicate event was handled
    }
