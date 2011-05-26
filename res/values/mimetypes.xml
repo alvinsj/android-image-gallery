@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string-array name="image">
+<item>bmp</item>
+<item>cmx</item>
+<item>cod</item>
+<item>gif</item>
+<item>ico</item>
+<item>ief</item>
+<item>jpe</item>
+<item>jpeg</item>
+<item>jpg</item>
+<item>jfif</item>
+<item>pbm</item>
+<item>pgm</item>
+<item>png</item>
+<item>pnm</item>
+<item>ppm</item>
+<item>ras</item>
+<item>rgb</item>
+<item>svg</item>
+<item>tif</item>
+<item>tiff</item>
+<item>xbm</item>
+<item>xpm</item>
+<item>xwd</item>
+</string-array>
+</resources>
