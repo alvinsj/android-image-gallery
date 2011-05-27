@@ -55,7 +55,7 @@ import com.androidworkz.imageviewflipper.R;
 import com.buuuk.android.util.FileUtils;
 
 
-public class ImageGrid extends Activity {
+public class ImageGrid extends Activity implements OnScrollListener{
 
     GridView mGrid;
     private static final String DIRECTORY = "/sdcard/";
@@ -71,7 +71,7 @@ public class ImageGrid extends Activity {
 
         setContentView(R.layout.grid);
         mGrid = (GridView) findViewById(R.id.myGrid);
-        
+        mGrid.setOnScrollListener(this);
        
         
         File data_directory = new File(DATA_DIRECTORY);
@@ -105,8 +105,8 @@ public class ImageGrid extends Activity {
 				ImageList = readdata.loadArray(DATA_FILE);
 			}
 		}
-		
-		 mGrid.setAdapter(new AppsAdapter());
+		mAdapter = new AppsAdapter();
+		 mGrid.setAdapter(mAdapter);
 		 mThumbnails = new HashMap<Integer,SoftReference<ImageView>>();
          mThumbnailImages = new HashMap<Integer,SoftReference<Bitmap>>();
     }
@@ -146,6 +146,7 @@ public class ImageGrid extends Activity {
         mApps = getPackageManager().queryIntentActivities(mainIntent, 0);
     }
 
+    public AppsAdapter mAdapter;
     public class AppsAdapter extends BaseAdapter {
         public AppsAdapter() {
         	map = new HashMap();
@@ -172,9 +173,9 @@ public class ImageGrid extends Activity {
         			&& mThumbnailImages.get(position).get()!=null) {
         		i.setImageBitmap(mThumbnailImages.get(position).get());
         	}
-        	else {
+        	else  {
         		i.setImageBitmap(null);
-        		loadThumbnail(i,position);
+        		if(!mBusy)loadThumbnail(i,position);
         	}
             
             i.setOnClickListener(new OnClickListener() {
@@ -215,13 +216,15 @@ public class ImageGrid extends Activity {
     }
     public void onScroll(AbsListView view, int firstVisibleItem,
     	    int visibleItemCount, int totalItemCount) {
-    	}
+    	
+    }
     
     public boolean mBusy = false;
     public void onScrollStateChanged(AbsListView view, int scrollState) {
         switch (scrollState) {
         case OnScrollListener.SCROLL_STATE_IDLE:
             mBusy = false;
+            mAdapter.notifyDataSetChanged();
             break;
         case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
             mBusy = true;
@@ -249,12 +252,12 @@ public class ImageGrid extends Activity {
     	t.cancel(true);
     }
     
-    public class LoadThumbnailTask extends AsyncTask<Integer, Void, Boolean>{
-
+    public class LoadThumbnailTask extends AsyncTask<Integer, Void, Bitmap>{
+    	private int position;
 		@Override
-		protected Boolean doInBackground(Integer... params) {
+		protected Bitmap doInBackground(Integer... params) {
         	try{
-				int position = params[0];
+				position = params[0];
 				Bitmap bitmapOrg = BitmapFactory.decodeFile(ImageList.get(position));
 	        
 	        	int width = bitmapOrg.getWidth();
@@ -278,15 +281,19 @@ public class ImageGrid extends Activity {
 	        	Bitmap bm = Bitmap.createBitmap(bitmapOrg, 0, 0,width, height, matrix, true);
 	            
 	            mThumbnailImages.put(position, new SoftReference<Bitmap>(bm));
-	            
-	            onThumbnailLoaded(position,bm, this);
+	            System.gc();
+	            return bm;
         	}catch(Exception e){
         		
         	}
             
             
-			return true;
+			return null;
 		}
+		protected void onPostExecute(Bitmap bm) {
+	         
+	         onThumbnailLoaded(position, bm, this);
+	     }
     	
     }
 
