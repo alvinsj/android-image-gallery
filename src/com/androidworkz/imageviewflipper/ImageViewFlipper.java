@@ -20,7 +20,7 @@ import java.util.zip.GZIPOutputStream;
 import com.androidworkz.imageviewflipper.R;
 import com.buuuk.android.ui.touch.TouchActivity;
 import com.buuuk.android.ui.touch.WrapMotionEvent;
-
+import com.buuuk.android.util.FileUtils;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -152,11 +152,10 @@ public class ImageViewFlipper extends TouchActivity {
 				android.R.anim.fade_in));
 		viewFlipper.setOutAnimation(AnimationUtils.loadAnimation(this,
 				android.R.anim.fade_out));
-		
-		iv.setImageDrawable(Drawable.createFromPath(ImageList
-				.get(currentIndex)));
-		resetImage(iv,Drawable.createFromPath(ImageList
-				.get(currentIndex)));
+		Drawable d = Drawable.createFromPath(ImageList
+				.get(currentIndex));
+		iv.setImageDrawable(d);
+		resetImage(iv,d);
 		System.gc();
 		
 		gestureDetector = new GestureDetector(new MyGestureDetector());
@@ -235,74 +234,7 @@ public class ImageViewFlipper extends TouchActivity {
 		return tFileList;
 	}
 
-	public class FileUtils {
-		
-		public void saveArray(String filename, List<String> output_field) {
-		     try {
-		        FileOutputStream fos = new FileOutputStream(filename);
-		        GZIPOutputStream gzos = new GZIPOutputStream(fos);
-		        ObjectOutputStream out = new ObjectOutputStream(gzos);
-		        out.writeObject(output_field);
-		        out.flush();
-		        out.close();
-		     }
-		     catch (IOException e) {
-		         e.getStackTrace(); 
-		     }
-		  }
-
-		  @SuppressWarnings("unchecked")
-		public List<String> loadArray(String filename) {
-		      try {
-		        FileInputStream fis = new FileInputStream(filename);
-		        GZIPInputStream gzis = new GZIPInputStream(fis);
-		        ObjectInputStream in = new ObjectInputStream(gzis);
-		        List<String> read_field = (List<String>)in.readObject();
-		        in.close();
-		        return read_field;
-		      }
-		      catch (Exception e) {
-		    	  e.getStackTrace();
-		      }
-		      return null;
-		  }
-		  
-		public File[] listFilesAsArray(File directory, FilenameFilter[] filter,
-				int recurse) {
-			Collection<File> files = listFiles(directory, filter, recurse);
-
-			File[] arr = new File[files.size()];
-			return files.toArray(arr);
-		}
-
-		public Collection<File> listFiles(File directory,
-				FilenameFilter[] filter, int recurse) {
-
-			Vector<File> files = new Vector<File>();
-
-			File[] entries = directory.listFiles();
-
-			if (entries != null) {
-				for (File entry : entries) {
-					for (FilenameFilter filefilter : filter) {
-						if (filter == null
-								|| filefilter
-										.accept(directory, entry.getName())) {
-							files.add(entry);
-							Log.v("ImageViewFlipper", "Added: "
-									+ entry.getName());
-						}
-					}
-					if ((recurse <= -1) || (recurse > 0 && entry.isDirectory())) {
-						recurse--;
-						files.addAll(listFiles(entry, filter, recurse));
-						recurse++;
-					}
-				}
-			}
-			return files;
-		}
-	}
+	
 
 	class MyGestureDetector extends SimpleOnGestureListener {
 		private int toggleCount = 0; 
@@ -366,6 +298,7 @@ public class ImageViewFlipper extends TouchActivity {
 					resetImage(iv,d);
 					Log.v("ImageViewFlipper", "Current View: " + currentView);
 					viewFlipper.showNext();
+				
 					return true;
 				} else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
 						&& Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
@@ -386,14 +319,17 @@ public class ImageViewFlipper extends TouchActivity {
 						currentView = 2;
 						iv = (ImageView) findViewById(R.id.two);
 						iv.setImageDrawable(d);
+						System.gc();
 					} else if (currentView == 2) {
 						currentView = 1;
 						iv = (ImageView) findViewById(R.id.one);
 						iv.setImageDrawable(d);
+						System.gc();
 					} else {
 						currentView = 0;
 						iv = (ImageView) findViewById(R.id.zero);
 						iv.setImageDrawable(d);
+						System.gc();
 					}
 					resetImage(iv,d);
 					Log.v("ImageViewFlipper", "Current View: " + currentView);
