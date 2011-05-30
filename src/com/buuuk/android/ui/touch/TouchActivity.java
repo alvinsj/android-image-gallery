@@ -19,8 +19,11 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.FloatMath;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
@@ -140,34 +143,56 @@ public abstract class TouchActivity extends Activity {
  		 float[] bottomright = new float[2];
 		 view.getImageMatrix().mapPoints(bottomright,point); //bottomright image point after applying matrix
  		 
+		 
+		 // get orientation
+		 Display display = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+		 int rotation = display.getRotation();
+		
+		 int orientation = 0;
+		 if( rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180)
+			orientation = 0;
+		 else
+			orientation = 1;
+		 
+		 
+		 boolean direction = true;
+		 
+ 		 float width = bottomright[0]-topleft[0];
+ 		 float height = bottomright[1]-topleft[1];
+ 		 
+ 		 
+	 	 if( (width>rect.right && height>rect.bottom)  )
+	 		direction=true;
+	 	 else
+	 		direction=false;
+	 	    
+ 		
+		 
 		 // snap to topright
- 		 if(topleft[0]>rect.left && isScaleChanged){
+ 		 if(topleft[0]>rect.left && bottomright[0]>rect.right && isScaleChanged && direction){
  			matrix.postTranslate(-topleft[0], 0);	 
  		 }
- 		 else if(bottomright[0]<rect.right && isScaleChanged){
+ 		 else if(bottomright[0]<rect.right && topleft[0]<rect.left && isScaleChanged && direction){
  			matrix.postTranslate(rect.right-bottomright[0], 0);	
  		 }
+ 		 else if(topleft[0]>rect.left && bottomright[0]>rect.right && isScaleChanged && !direction){
+ 			matrix.postTranslate(-(bottomright[0]-rect.right), 0);	 
+ 		 }
+ 		 else if(bottomright[0]<rect.right && topleft[0]<rect.left && isScaleChanged && !direction){
+ 			matrix.postTranslate(-(topleft[0]-rect.left), 0);	
+ 		 }
  		 
- 		 if(isScaleChanged){
- 			 float width = bottomright[0]-topleft[0];
- 			 float height = bottomright[1]-topleft[1];
- 			 if( (width>rect.right && height>rect.bottom) )
- 				 isScaleChanged=true;
- 			 else
- 				 isScaleChanged=false;
-		 }
  		 
- 		 if(bottomright[1]>rect.bottom && topleft[1]>rect.top && isScaleChanged){
+ 		 if(bottomright[1]>rect.bottom && topleft[1]>rect.top && isScaleChanged && direction){
  			matrix.postTranslate(0, -topleft[1]);
  		 }
- 		 else if(bottomright[1]<rect.bottom && topleft[1]<rect.top && isScaleChanged){
+ 		 else if(bottomright[1]<rect.bottom && topleft[1]<rect.top && isScaleChanged && direction){
   			matrix.postTranslate(0, rect.bottom-bottomright[1]);
  		 }
- 		 
- 		 if(bottomright[1]>rect.bottom && topleft[1]>rect.top && !isScaleChanged){
+ 		 else if(bottomright[1]>rect.bottom && topleft[1]>rect.top && isScaleChanged && !direction){
  			matrix.postTranslate(0, -(bottomright[1]-rect.bottom));
  		 }
- 		 else if(bottomright[1]<rect.bottom && topleft[1]<rect.top && !isScaleChanged){
+ 		 else if(bottomright[1]<rect.bottom && topleft[1]<rect.top && isScaleChanged && !direction){
   			matrix.postTranslate(0, -(topleft[1]-rect.top));
  		 }
  		 
