@@ -14,6 +14,7 @@ import android.R;
 import android.app.Activity;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.FloatMath;
@@ -112,10 +113,55 @@ public abstract class TouchActivity extends Activity {
          refLineEnd = null;
          mRotateAngle = 0f;
          
+         boolean isScaleChanged=true;
          float[] values = new float[9];
  	     view.getImageMatrix().getValues(values);
- 		 if(values[0]<=getMinZoomScale())
- 		   resetImage(view,view.getDrawable());
+ 		 if(values[0]<=getMinZoomScale()) {
+ 			 resetImage(view,view.getDrawable());
+ 			 isScaleChanged=false;
+ 		 }
+ 		 
+ 			 
+ 		 
+ 		 Rect rect = new Rect();
+ 		 view.getDrawingRect(rect);
+ 		 Log.d("ImageView","Drawing Rect: "+rect.top+","+rect.right+","+rect.bottom+","+rect.left);
+ 		 
+ 		 float[] point = new float[2];
+ 		 
+ 		//for top and left
+ 		 point[0]= rect.left;
+ 		 point[1]= rect.top;
+ 		 float[] topleft = new float[2]; 
+ 		 view.getImageMatrix().mapPoints(topleft,point); // topleft image point after applying matrix
+ 		
+ 		 point[0] = view.getDrawable().getIntrinsicWidth();
+		 point[1] = view.getDrawable().getIntrinsicHeight();
+ 		 float[] bottomright = new float[2];
+		 view.getImageMatrix().mapPoints(bottomright,point); //bottomright image point after applying matrix
+ 		 
+		 // snap to topright
+ 		 if(topleft[0]>rect.left && isScaleChanged){
+ 			matrix.postTranslate(-topleft[0], 0);	 
+ 		 }
+ 		 else if(bottomright[0]<rect.right && isScaleChanged){
+ 			matrix.postTranslate(rect.right-bottomright[0], 0);	
+ 		 }
+ 		 
+ 		 if(bottomright[1]>rect.bottom && topleft[1]>rect.top){
+ 			matrix.postTranslate(0, -topleft[1]);
+ 		 }
+ 		 else if(bottomright[1]<rect.bottom && topleft[1]<rect.top){
+  			matrix.postTranslate(0, rect.bottom-bottomright[1]);
+ 		 }
+		 /*if(topleft[1]>rect.top && isScaleChanged){
+	 		if(bottomright[0]>rect.right && bottomright[1]>rect.bottom)
+	 			matrix.postTranslate(0, -topleft[1]);
+		 }*/
+		
+ 		 
+ 		 Log.d("ImageView", "Map points source "+point[0]+","+point[1]+ " to topleft:"+topleft[0]+","+topleft[1]+" and bottomright:"+bottomright[0]+","+bottomright[1]);
+ 		 
          break;
       case MotionEvent.ACTION_MOVE:
          if (mode == DRAG) {

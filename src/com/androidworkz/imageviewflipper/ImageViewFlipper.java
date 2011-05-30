@@ -360,7 +360,8 @@ public class ImageViewFlipper extends TouchActivity {
         
         mMinZoomScale = 1;
         if( orientation==0 
-        		&& (float)draw.getIntrinsicWidth() >  (float)getWindowManager().getDefaultDisplay().getWidth()) {
+        		//&& (float)draw.getIntrinsicWidth() >  (float)getWindowManager().getDefaultDisplay().getWidth()
+        		) {
         	
         	scale = (float)getWindowManager().getDefaultDisplay().getWidth()/(float)draw.getIntrinsicWidth();  
         	mMinZoomScale = scale;
@@ -368,7 +369,8 @@ public class ImageViewFlipper extends TouchActivity {
         
         	iv.setImageMatrix(matrix);
         }else if( orientation==1 
-        		&& (float)draw.getIntrinsicHeight() >  (float)getWindowManager().getDefaultDisplay().getHeight()){
+        		//&& (float)draw.getIntrinsicHeight() >  (float)getWindowManager().getDefaultDisplay().getHeight()
+        		){
         	scale = (float)getWindowManager().getDefaultDisplay().getHeight()/(float)draw.getIntrinsicHeight();  
         	mMinZoomScale = scale;
         	matrix.postScale(scale,scale);
