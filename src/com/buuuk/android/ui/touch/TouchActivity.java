@@ -121,7 +121,7 @@ public abstract class TouchActivity extends Activity {
  			 isScaleChanged=false;
  		 }
  		 
- 			 
+ 		 
  		 
  		 Rect rect = new Rect();
  		 view.getDrawingRect(rect);
@@ -148,17 +148,28 @@ public abstract class TouchActivity extends Activity {
  			matrix.postTranslate(rect.right-bottomright[0], 0);	
  		 }
  		 
- 		 if(bottomright[1]>rect.bottom && topleft[1]>rect.top){
+ 		 if(isScaleChanged){
+ 			 float width = bottomright[0]-topleft[0];
+ 			 float height = bottomright[1]-topleft[1];
+ 			 if( (width>rect.right && height>rect.bottom) )
+ 				 isScaleChanged=true;
+ 			 else
+ 				 isScaleChanged=false;
+		 }
+ 		 
+ 		 if(bottomright[1]>rect.bottom && topleft[1]>rect.top && isScaleChanged){
  			matrix.postTranslate(0, -topleft[1]);
  		 }
- 		 else if(bottomright[1]<rect.bottom && topleft[1]<rect.top){
+ 		 else if(bottomright[1]<rect.bottom && topleft[1]<rect.top && isScaleChanged){
   			matrix.postTranslate(0, rect.bottom-bottomright[1]);
  		 }
-		 /*if(topleft[1]>rect.top && isScaleChanged){
-	 		if(bottomright[0]>rect.right && bottomright[1]>rect.bottom)
-	 			matrix.postTranslate(0, -topleft[1]);
-		 }*/
-		
+ 		 
+ 		 if(bottomright[1]>rect.bottom && topleft[1]>rect.top && !isScaleChanged){
+ 			matrix.postTranslate(0, -(bottomright[1]-rect.bottom));
+ 		 }
+ 		 else if(bottomright[1]<rect.bottom && topleft[1]<rect.top && !isScaleChanged){
+  			matrix.postTranslate(0, -(topleft[1]-rect.top));
+ 		 }
  		 
  		 Log.d("ImageView", "Map points source "+point[0]+","+point[1]+ " to topleft:"+topleft[0]+","+topleft[1]+" and bottomright:"+bottomright[0]+","+bottomright[1]);
  		 
