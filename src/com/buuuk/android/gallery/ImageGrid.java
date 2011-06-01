@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.androidworkz.imageviewflipper;
+package com.buuuk.android.gallery;
 
 import android.app.Activity;
 import android.content.Context;
@@ -51,7 +51,7 @@ import java.util.Map;
 
 //Need the following import to get access to the app resources, since this
 //class is in a sub-package.
-import com.androidworkz.imageviewflipper.R;
+import com.buuuk.android.gallery.R;
 import com.buuuk.android.util.FileUtils;
 
 
@@ -163,11 +163,6 @@ public class ImageGrid extends Activity implements OnScrollListener{
             } else {
                 i = (ImageView) convertView;
             }
-
-            
-            //else
-           // 	i.setImageDrawable(Drawable.createFromPath(ImageList
-			//	.get(position)));
             
             if(!mBusy && mThumbnailImages.containsKey(position) 
         			&& mThumbnailImages.get(position).get()!=null) {

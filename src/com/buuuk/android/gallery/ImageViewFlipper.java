@@ -1,4 +1,4 @@
-package com.androidworkz.imageviewflipper;
+package com.buuuk.android.gallery;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,7 +17,7 @@ import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import com.androidworkz.imageviewflipper.R;
+import com.buuuk.android.gallery.R;
 import com.buuuk.android.ui.touch.TouchActivity;
 import com.buuuk.android.ui.touch.WrapMotionEvent;
 import com.buuuk.android.util.FileUtils;
